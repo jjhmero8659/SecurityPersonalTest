@@ -82,8 +82,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .sessionManagement()
 //                .maximumSessions(1)
 //                .maxSessionsPreventsLogin(true);
-                .sessionFixation()
-//                .none()
-                .changeSessionId();//로그인 할때마다 쿠키 값이 자동으로 변경 , 고정 세션공격 방지
+//                .sessionFixation()
+////                .none()
+//                .changeSessionId();//로그인 할때마다 쿠키 값이 자동으로 변경 , 고정 세션공격 방지
+                .maximumSessions(1)//최대 접속자 수를 1명으로 제한
+                .maxSessionsPreventsLogin(true) // 추가적으로 접속자가 생긴다면 밴 (true)
+                //false 라면 추가적 접속자가 생길때 이전 사용자를 밴
+
+        ;
     }
 }
