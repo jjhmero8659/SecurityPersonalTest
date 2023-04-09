@@ -8,8 +8,8 @@ import javax.persistence.Id;
 @Data
 public class AccountDto {
 
-        private String userName;
-        private String passWord;
+        private String username;
+        private String password;
         private String email;
         private Long age;
         private String role;

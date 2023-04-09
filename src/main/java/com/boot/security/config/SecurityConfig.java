@@ -1,5 +1,6 @@
 package com.boot.security.config;
 
+import com.boot.security.CustomAuthenticationProvider;
 import jdk.internal.dynalink.support.NameCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -46,31 +48,20 @@ import java.io.IOException;
 @PropertySource("classpath:/application.yml")
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
-    private ApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+//    private ApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-    public class WebConfig implements WebMvcConfigurer {
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry
-                    .addMapping("/**")
-                    .allowedOrigins("http://localhost:3000","http://localhost:4000")
-                    .allowedMethods(
-                            HttpMethod.GET.name(),
-                            HttpMethod.POST.name(),
-                            HttpMethod.PUT.name(),
-                            HttpMethod.DELETE.name()
-                    )
-            ;
-        }
-    }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .userDetailsService(userDetailsService);
+        auth
+                .authenticationProvider(authenticationProvider());
+    }
 
-        String password = passwordEncoder().encode("1111");
-
-        auth.inMemoryAuthentication().withUser("user").password(password).roles("USER");
-        auth.inMemoryAuthentication().withUser("user").password(password).roles("MANAGER");
-        auth.inMemoryAuthentication().withUser("user").password(password).roles("ADMIN");
+    private AuthenticationProvider authenticationProvider() {
+        return  new CustomAuthenticationProvider();
     }
 
     @Override
@@ -84,8 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .cors()
                 .and()
 
-                .csrf()
-                .and()
+                .csrf().disable() // 추후 수정
+
 
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
@@ -96,11 +87,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
                 .formLogin();
     }
+    @Bean
+    public PasswordEncoder passwordEncoder() { //평문 비밀번호를 암호화
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
@@ -109,8 +105,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         return source;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() { //평문 비밀번호를 암호화
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+    public class WebConfig implements WebMvcConfigurer {
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry
+                    .addMapping("/**")
+                    .allowedOrigins("http://localhost:3000","http://localhost:4000")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE")
+                    .allowedHeaders("*")
+                    .allowCredentials(true);
+            ;
+        }
     }
 }

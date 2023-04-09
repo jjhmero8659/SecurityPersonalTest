@@ -11,8 +11,8 @@ import javax.persistence.Id;
 public class Account {
     @Id @GeneratedValue
     private Long id;
-    private String passWord;
-    private String userName;
+    private String password;
+    private String username;
 
     private String email;
     private Long age;
