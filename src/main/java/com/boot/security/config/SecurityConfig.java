@@ -2,6 +2,7 @@ package com.boot.security.config;
 
 import com.boot.security.CustomAuthenticationProvider;
 import jdk.internal.dynalink.support.NameCodec;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -46,11 +48,15 @@ import java.io.IOException;
 @Configuration
 @EnableWebSecurity //웹 보안 활성화
 @PropertySource("classpath:/application.yml")
+@Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
 //    private ApplicationContext applicationContext = new AnnotationConfigApplicationContext();
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private AuthenticationDetailsSource authenticationDetailsSource;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -85,7 +91,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
                 .and()
 
-                .formLogin();
+                .formLogin()
+                .authenticationDetailsSource(authenticationDetailsSource)
+        ;
     }
     @Bean
     public PasswordEncoder passwordEncoder() { //평문 비밀번호를 암호화
