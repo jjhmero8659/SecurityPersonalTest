@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,8 +23,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException { //검증 구현
-        // Authentication authentication 사용자가 입력한 id , password 정보가 담겨있음
+        System.out.println(authentication);
         String username = authentication.getName();
+        System.out.println(username);
         String password = (String) authentication.getCredentials();
 
         AccountContext accountContext = (AccountContext) userDetailsService.loadUserByUsername(username); //DB 조회

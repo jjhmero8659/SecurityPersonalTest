@@ -13,6 +13,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -92,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
 
                 .formLogin()
-                .authenticationDetailsSource(authenticationDetailsSource)
+//                .authenticationDetailsSource(authenticationDetailsSource)
         ;
     }
     @Bean
@@ -111,6 +112,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
 
